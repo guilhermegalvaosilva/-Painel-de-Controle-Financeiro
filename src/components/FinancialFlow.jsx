@@ -1,4 +1,5 @@
 import { compactBrl, percent } from '../utils/formatters'
+import { CardHelpButton } from './CardHelpButton'
 
 export function FinancialFlow({ total, released, receivable, realized, committed, balance }) {
   const rows = [
@@ -14,6 +15,12 @@ export function FinancialFlow({ total, released, receivable, realized, committed
 
   return (
     <section className="panel flow-panel">
+      <CardHelpButton
+        title="Fluxo financeiro"
+        description="Mostra a sequência financeira da carteira: valor contratado, recurso liberado, recurso a receber, total realizado, comprometido e saldo atual."
+        detail="Ajuda a comparar o tamanho de cada etapa financeira da base."
+        value={`${percent.format(execution)} executado`}
+      />
       <div className="panel__heading">
         <div>
           <h2>Fluxo financeiro</h2>

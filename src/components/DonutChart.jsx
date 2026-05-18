@@ -1,8 +1,9 @@
 import { compactBrl } from '../utils/formatters'
+import { CardHelpButton } from './CardHelpButton'
 
 const colors = ['#0f766e', '#d97706', '#2563eb', '#9f1239', '#5b21b6', '#475569']
 
-export function DonutChart({ title, subtitle, items }) {
+export function DonutChart({ title, subtitle, items, info }) {
   const total = items.reduce((sum, item) => sum + item.value, 0)
   const slices = items.map((item, index) => {
     const previous = items.slice(0, index).reduce((sum, slice) => sum + slice.value, 0)
@@ -17,6 +18,12 @@ export function DonutChart({ title, subtitle, items }) {
 
   return (
     <section className="panel chart-panel panel--donut">
+      <CardHelpButton
+        title={title}
+        description={info || 'Gráfico de participação usado para mostrar como o valor se distribui entre os grupos da base.'}
+        detail={subtitle || 'As fatias representam a proporção de cada grupo.'}
+        value={`${items.length} grupos`}
+      />
       <div className="panel-title">
         <div className="title-dot" />
         <div>

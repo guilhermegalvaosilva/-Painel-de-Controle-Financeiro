@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { CardHelpButton } from './CardHelpButton'
 import { brl, dateShort, lifecycleStatus, percent } from '../utils/formatters'
 
 const pageSize = 12
@@ -346,6 +347,12 @@ export function ProjectTable({ projects }) {
 
   return (
     <section className="panel table-panel">
+      <CardHelpButton
+        title="Base de Projetos GEREB"
+        description="Tabela analítica com os projetos do recorte atual. Ela permite conferir os registros que alimentam os cards, rankings e gráficos do dashboard."
+        detail="O botão exporta a mesma seleção filtrada para XLSX."
+        value={`${projects.length} projetos filtrados`}
+      />
       <div className="table-header">
         <div>
           <h2>Base de Projetos GEREB</h2>
