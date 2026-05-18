@@ -80,14 +80,6 @@
   border-right: 3px solid var(--green);
   transform: skewX(-25deg);
 }
-
-.topbar h1 {
-  margin: 0;
-  color: var(--blue-dark);
-  font-size: 20px;
-  line-height: 1.1;
-}
-
 .topbar p {
   margin: 4px 0 0;
   color: var(--muted);

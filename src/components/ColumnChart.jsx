@@ -42,10 +42,12 @@ export function ColumnChart({ title, subtitle, groups, info }) {
                     height: `${Math.max((value / max) * 100, value > 0 ? 3 : 0)}%`,
                     background: palette[index],
                   }}
-                />
+                >
+                  <b className="col-value">{compactBrl.format(value)}</b>
+                </span>
               ))}
             </div>
-            <small>{group.label}</small>
+            <small className="group-label" title={group.label}>{group.label}</small>
           </div>
         ))}
       </div>
