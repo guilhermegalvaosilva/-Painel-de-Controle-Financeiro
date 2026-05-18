@@ -750,46 +750,59 @@
 
 .column-chart {
   display: grid;
-  grid-template-columns: repeat(10, minmax(42px, 1fr));
-  gap: 12px;
-  height: 210px;
-  padding: 14px 12px 36px;
-  background-image:
-    linear-gradient(to right, rgba(0, 113, 173, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
-  background-size: 80px 100%, 100% 42px;
-}
-
-.column-group {
-  position: relative;
-  display: grid;
-  align-items: end;
-}
-
-.columns {
-  display: flex;
-  gap: 3px;
-  align-items: end;
-  height: 100%;
-}
-
-.columns span {
-  flex: 1;
-  min-width: 5px;
-}
-
-.column-group small {
-  position: absolute;
-  right: 50%;
-  bottom: -32px;
-  width: 80px;
-  color: #385f6f;
-  font-size: 9px;
-  text-align: right;
-  transform: rotate(-47deg);
-  transform-origin: right center;
-}
-
+   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+   gap: 14px;
+   min-height: 260px;
+   max-height: 320px;
+   padding: 18px 14px 40px;
+   background: #f8fafc;
+ }
+ 
+ .column-group {
+   position: relative;
+   display: grid;
+   gap: 10px;
+   align-items: end;
+ }
+ 
+ .columns {
+   display: grid;
+   grid-template-columns: repeat(3, minmax(16px, 1fr));
+   gap: 8px;
+   align-items: end;
+   height: 100%;
+   min-height: 160px;
+ }
+ 
+ .column-bar {
+   position: relative;
+   display: flex;
+   align-items: flex-end;
+   justify-content: center;
+   min-height: 6px;
+   border-radius: 10px 10px 4px 4px;
+ }
+ 
+ .col-value {
+   position: absolute;
+   top: -20px;
+   left: 50%;
+   transform: translateX(-50%);
+   color: var(--blue-dark);
+   font-size: 10px;
+   font-weight: 800;
+   white-space: nowrap;
+ }
+ 
+ .group-label {
+   display: block;
+   margin-top: 4px;
+   color: var(--muted);
+   font-size: 11px;
+   text-align: center;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
 .table-panel {
   position: relative;
   margin-top: 20px;

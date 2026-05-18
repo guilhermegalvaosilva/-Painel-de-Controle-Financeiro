@@ -35,16 +35,17 @@ export function ColumnChart({ title, subtitle, groups, info }) {
           <div className="column-group" key={group.label}>
             <div className="columns">
               {group.values.map((value, index) => (
-                <span
+                <div
                   key={`${group.label}-${rubrics[index]}`}
+                  className="column-bar"
                   title={`${rubrics[index]}: ${compactBrl.format(value)}`}
                   style={{
-                    height: `${Math.max((value / max) * 100, value > 0 ? 3 : 0)}%`,
+                    height: `${Math.max((value / max) * 100, value > 0 ? 4 : 0)}%`,
                     background: palette[index],
                   }}
                 >
                   <b className="col-value">{compactBrl.format(value)}</b>
-                </span>
+                </div>
               ))}
             </div>
             <small className="group-label" title={group.label}>{group.label}</small>
