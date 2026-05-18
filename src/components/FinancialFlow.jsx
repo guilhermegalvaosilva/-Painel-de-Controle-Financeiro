@@ -10,6 +10,7 @@ export function FinancialFlow({ total, released, receivable, realized, committed
     { label: 'Saldo atual', value: balance, tone: balance < 0 ? 'alert' : 'cash' },
   ]
   const max = Math.max(...rows.map((row) => Math.abs(row.value)), 1)
+  const execution = total ? realized / total : 0
 
   return (
     <section className="panel flow-panel">
@@ -18,7 +19,7 @@ export function FinancialFlow({ total, released, receivable, realized, committed
           <h2>Fluxo financeiro</h2>
           <p>Leitura consolidada entre contratado, liberado, realizado e saldo.</p>
         </div>
-        <strong>{percent.format(realized / total)} executado</strong>
+        <strong>{percent.format(execution)} executado</strong>
       </div>
       <div className="flow-stack">
         {rows.map((row) => (

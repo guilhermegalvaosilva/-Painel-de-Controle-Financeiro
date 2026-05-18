@@ -2,26 +2,44 @@ import { useMemo, useState } from "react";
 import { BarList } from "./components/BarList";
 import { ColumnChart } from "./components/ColumnChart";
 import { DonutChart } from "./components/DonutChart";
+import { FinancialFlow } from "./components/FinancialFlow";
 import { MetricCard } from "./components/MetricCard";
 import { ProjectTable } from "./components/ProjectTable";
 import { projects } from "./data/projects";
-import { brl, groupBySum, sumBy } from "./utils/formatters";
+import {
+  brl,
+  groupByCount,
+  groupBySum,
+  lifecycleStatus,
+  percent,
+  sumBy,
+} from "./utils/formatters";
 import "./styles/dashboard.css";
 
 const allOption = "Todos";
+const supportOptions = [allOption, "Sim", "Não"];
+
+const optionList = (values) => [
+  allOption,
+  ...new Set(
+    values
+      .filter(Boolean)
+      .map((value) => String(value).trim())
+      .sort((a, b) => a.localeCompare(b, "pt-BR")),
+  ),
+];
+
 const projectOptions = [allOption, ...projects.map((project) => project.id)];
-const modalityOptions = [
-  allOption,
-  ...new Set(projects.map((project) => project.instrumentType)),
-];
-const areaOptions = [
-  allOption,
-  ...new Set(projects.map((project) => project.unit)),
-];
-const funderOptions = [
-  allOption,
-  ...new Set(projects.map((project) => project.funder)),
-];
+const modalityOptions = optionList(
+  projects.map((project) => project.instrumentType),
+);
+const areaOptions = optionList(projects.map((project) => project.unit));
+const funderOptions = optionList(projects.map((project) => project.funder));
+const natureOptions = optionList(projects.map((project) => project.nature));
+const axisOptions = optionList(projects.map((project) => project.axis));
+const instrumentOptions = optionList(
+  projects.map((project) => project.instrumentNumber),
+);
 
 function App() {
   const [filters, setFilters] = useState({
@@ -29,6 +47,10 @@ function App() {
     modality: allOption,
     area: allOption,
     funder: allOption,
+    nature: allOption,
+    axis: allOption,
+    supportTed: allOption,
+    instrumentNumber: allOption,
     start: "",
     end: "",
   });
@@ -48,6 +70,16 @@ function App() {
           filters.area === allOption || project.unit === filters.area;
         const matchesFunder =
           filters.funder === allOption || project.funder === filters.funder;
+        const matchesNature =
+          filters.nature === allOption || project.nature === filters.nature;
+        const matchesAxis =
+          filters.axis === allOption || project.axis === filters.axis;
+        const matchesSupport =
+          filters.supportTed === allOption ||
+          (filters.supportTed === "Sim") === project.supportTed;
+        const matchesInstrument =
+          filters.instrumentNumber === allOption ||
+          project.instrumentNumber === filters.instrumentNumber;
         const matchesStart = !filters.start || project.start >= filters.start;
         const matchesEnd = !filters.end || project.end <= filters.end;
 
@@ -56,6 +88,10 @@ function App() {
           matchesModality &&
           matchesArea &&
           matchesFunder &&
+          matchesNature &&
+          matchesAxis &&
+          matchesSupport &&
+          matchesInstrument &&
           matchesStart &&
           matchesEnd
         );
@@ -64,35 +100,79 @@ function App() {
   );
 
   const totals = useMemo(
-    () => ({
-      total: sumBy(filteredProjects, "total"),
-      released: sumBy(filteredProjects, "released"),
-      receivable: sumBy(filteredProjects, "receivable"),
-      realized: sumBy(filteredProjects, "realized"),
-      committed: sumBy(filteredProjects, "committed"),
-      balance: sumBy(filteredProjects, "currentBalance"),
-      closed: filteredProjects.filter((project) => project.currentBalance <= 0)
-        .length,
-    }),
+    () => {
+      const today = new Date();
+      const supportTedCount = filteredProjects.filter(
+        (project) => project.supportTed,
+      ).length;
+      const negativeBalance = filteredProjects.filter(
+        (project) => project.currentBalance < 0,
+      ).length;
+      const closed = filteredProjects.filter(
+        (project) => new Date(`${project.end}T12:00:00`) < today,
+      ).length;
+
+      return {
+        projects: filteredProjects.length,
+        total: sumBy(filteredProjects, "total"),
+        budgetBalance: sumBy(filteredProjects, "budgetBalance"),
+        released: sumBy(filteredProjects, "released"),
+        receivable: sumBy(filteredProjects, "receivable"),
+        realized: sumBy(filteredProjects, "realized"),
+        committed: sumBy(filteredProjects, "committed"),
+        balance: sumBy(filteredProjects, "currentBalance"),
+        earnings: sumBy(filteredProjects, "earnings"),
+        supportTedCount,
+        negativeBalance,
+        closed,
+      };
+    },
     [filteredProjects],
   );
 
-  const topProjects = useMemo(
+  const executionRate = totals.total ? totals.realized / totals.total : 0;
+  const releasedRate = totals.total ? totals.released / totals.total : 0;
+  const availableCash = totals.released - totals.realized - totals.committed;
+
+  const topRealizedProjects = useMemo(
     () =>
       [...filteredProjects]
         .sort((a, b) => b.realized - a.realized)
-        .slice(0, 11)
+        .slice(0, 10)
         .map((project) => ({ label: project.id, value: project.realized })),
     [filteredProjects],
   );
 
-  const donutItems = useMemo(
+  const topTotalProjects = useMemo(
     () =>
-      groupBySum(filteredProjects, "instrumentType", "realized").slice(0, 6),
+      [...filteredProjects]
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 10)
+        .map((project) => ({ label: project.id, value: project.total })),
     [filteredProjects],
   );
 
-  const columnGroups = useMemo(
+  const instrumentItems = useMemo(
+    () => groupBySum(filteredProjects, "instrumentType", "total").slice(0, 6),
+    [filteredProjects],
+  );
+
+  const natureItems = useMemo(
+    () => groupBySum(filteredProjects, "nature", "total").slice(0, 6),
+    [filteredProjects],
+  );
+
+  const funderItems = useMemo(
+    () => groupBySum(filteredProjects, "funder", "total").slice(0, 8),
+    [filteredProjects],
+  );
+
+  const axisItems = useMemo(
+    () => groupBySum(filteredProjects, "axis", "total").slice(0, 6),
+    [filteredProjects],
+  );
+
+  const coordinationGroups = useMemo(
     () =>
       groupBySum(filteredProjects, "unit", "realized")
         .slice(0, 10)
@@ -113,9 +193,69 @@ function App() {
     [filteredProjects],
   );
 
+  const statusItems = useMemo(
+    () =>
+      groupByCount(
+        filteredProjects.map((project) => ({
+          ...project,
+          status: lifecycleStatus(project).label,
+        })),
+        "status",
+      ),
+    [filteredProjects],
+  );
+
+  const endYearItems = useMemo(() => {
+    const grouped = new Map();
+
+    filteredProjects.forEach((project) => {
+      const year = project.end ? project.end.slice(0, 4) : "Sem data";
+      grouped.set(year, (grouped.get(year) || 0) + 1);
+    });
+
+    return [...grouped.entries()]
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => String(a.label).localeCompare(String(b.label), "pt-BR"));
+  }, [filteredProjects]);
+
   const balanceRanking = [...filteredProjects]
     .sort((a, b) => b.currentBalance - a.currentBalance)
     .slice(0, 5);
+
+  const portfolioStats = [
+    {
+      label: "Projetos filtrados",
+      value: totals.projects,
+      detail: `de ${projects.length} na base`,
+    },
+    {
+      label: "Coordenações",
+      value: new Set(filteredProjects.map((project) => project.unit)).size,
+      detail: "campo Coordenação",
+    },
+    {
+      label: "Financiadores",
+      value: new Set(filteredProjects.map((project) => project.funder)).size,
+      detail: "campo Ente Financiador",
+    },
+    {
+      label: "Instrumentos",
+      value: new Set(filteredProjects.map((project) => project.instrumentType))
+        .size,
+      detail: "tipos contratuais",
+    },
+    {
+      label: "TED de suporte",
+      value: totals.supportTedCount,
+      detail: `${percent.format(totals.projects ? totals.supportTedCount / totals.projects : 0)} da seleção`,
+    },
+    {
+      label: "Saldo negativo",
+      value: totals.negativeBalance,
+      detail: "projetos em atenção",
+      tone: totals.negativeBalance ? "danger" : "success",
+    },
+  ];
 
   const resetFilters = () =>
     setFilters({
@@ -123,6 +263,10 @@ function App() {
       modality: allOption,
       area: allOption,
       funder: allOption,
+      nature: allOption,
+      axis: allOption,
+      supportTed: allOption,
+      instrumentNumber: allOption,
       start: "",
       end: "",
     });
@@ -133,13 +277,17 @@ function App() {
         <div className="brandline">
           <span className="brand-icon" />
           <div>
-            <h1>Painel de Controle Financeiro</h1>
-            <p>Fiocruz Brasília | Execução de Gastos DI 2026</p>
+            <h1>Painel de Projetos GEREB</h1>
+            <p>Fiocruz Brasília | Base Excel de 2025</p>
           </div>
+        </div>
+        <div className="source-badge">
+          <span>{projects.length} projetos</span>
+          <strong>23 campos da planilha</strong>
         </div>
       </header>
 
-      <section className="filter-panel" aria-label="Filtros financeiros">
+      <section className="filter-panel" aria-label="Filtros da base GEREB">
         <FilterSelect
           label="Projeto"
           value={filters.project}
@@ -147,25 +295,49 @@ function App() {
           options={projectOptions}
         />
         <FilterSelect
-          label="Modalidade"
+          label="Instrumento"
           value={filters.modality}
           onChange={(value) => updateFilter("modality", value)}
           options={modalityOptions}
         />
         <FilterSelect
-          label="Área demandante"
+          label="Coordenação"
           value={filters.area}
           onChange={(value) => updateFilter("area", value)}
           options={areaOptions}
         />
         <FilterSelect
-          label="Favorecido"
+          label="Ente financiador"
           value={filters.funder}
           onChange={(value) => updateFilter("funder", value)}
           options={funderOptions}
         />
+        <FilterSelect
+          label="Natureza"
+          value={filters.nature}
+          onChange={(value) => updateFilter("nature", value)}
+          options={natureOptions}
+        />
+        <FilterSelect
+          label="Eixo estratégico"
+          value={filters.axis}
+          onChange={(value) => updateFilter("axis", value)}
+          options={axisOptions}
+        />
+        <FilterSelect
+          label="Nº instrumento"
+          value={filters.instrumentNumber}
+          onChange={(value) => updateFilter("instrumentNumber", value)}
+          options={instrumentOptions}
+        />
+        <FilterSelect
+          label="TED suporte"
+          value={filters.supportTed}
+          onChange={(value) => updateFilter("supportTed", value)}
+          options={supportOptions}
+        />
         <label className="filter-control">
-          <span>Data inicial</span>
+          <span>Início vigência</span>
           <input
             type="date"
             value={filters.start}
@@ -173,7 +345,7 @@ function App() {
           />
         </label>
         <label className="filter-control">
-          <span>Data final</span>
+          <span>Fim vigência</span>
           <input
             type="date"
             value={filters.end}
@@ -188,65 +360,143 @@ function App() {
         </div>
       </section>
 
-      <section className="kpi-row">
+      <section className="portfolio-band" aria-label="Resumo da carteira">
+        {portfolioStats.map((stat) => (
+          <article
+            className={stat.tone ? `portfolio-stat portfolio-stat--${stat.tone}` : "portfolio-stat"}
+            key={stat.label}
+          >
+            <span>{stat.label}</span>
+            <strong>{stat.value}</strong>
+            <small>{stat.detail}</small>
+          </article>
+        ))}
+      </section>
+
+      <section className="kpi-row kpi-row--financial">
         <MetricCard
-          label="Total gasto 2026"
-          value={totals.realized}
-          detail="Soma realizada no recorte"
+          label="Valor total dos instrumentos"
+          value={totals.total}
+          detail="Soma contratual"
+          tone="blue"
+        />
+        <MetricCard
+          label="Saldo orçamentário atual"
+          value={totals.budgetBalance}
+          detail="Campo da planilha"
           tone="teal"
         />
         <MetricCard
-          label="Projeto com maior gasto"
-          value={topProjects[0]?.label || "-"}
-          detail={brl.format(topProjects[0]?.value || 0)}
-          tone="amber"
-        />
-        <MetricCard
-          label="Saldo total dos projetos"
-          value={totals.balance}
-          detail="Caixa disponível agregado"
-          tone={totals.balance < 0 ? "red" : "blue"}
-        />
-        <MetricCard
-          label="Saldo total geral disponível"
-          value={totals.released - totals.realized - totals.committed}
-          detail={brl.format(totals.released)}
+          label="Recurso liberado"
+          value={totals.released}
+          detail={`${percent.format(releasedRate)} do contratado`}
           tone="green"
         />
         <MetricCard
-          label="Projetos encerrados"
-          value={totals.closed}
-          detail={`${filteredProjects.length} projetos no filtro`}
+          label="Recurso a receber"
+          value={totals.receivable}
+          detail="Previsão ainda não liberada"
+          tone="amber"
+        />
+        <MetricCard
+          label="Total realizado"
+          value={totals.realized}
+          detail={`${percent.format(executionRate)} executado`}
           tone="violet"
-          format="plain"
+        />
+        <MetricCard
+          label="Total comprometido"
+          value={totals.committed}
+          detail="Compromissos registrados"
+          tone="red"
+        />
+        <MetricCard
+          label="Saldo total atual"
+          value={totals.balance}
+          detail={`${brl.format(availableCash)} caixa livre`}
+          tone={totals.balance < 0 ? "red" : "green"}
+        />
+        <MetricCard
+          label="Rendimentos"
+          value={totals.earnings}
+          detail="Acumulado da carteira"
+          tone={totals.earnings < 0 ? "red" : "blue"}
         />
       </section>
 
-      <section className="charts-row">
-        <BarList
-          title="Ranking de Projetos (Por concentração de recursos executados - DI)"
-          items={topProjects}
-          limit={11}
+      <section className="dashboard-grid">
+        <FinancialFlow
+          total={totals.total}
+          released={totals.released}
+          receivable={totals.receivable}
+          realized={totals.realized}
+          committed={totals.committed}
+          balance={totals.balance}
         />
         <DonutChart
-          title="Utilização por Tipo de Gasto"
+          title="Carteira por Tipo de Instrumento"
+          subtitle="Valor total do instrumento contratual"
           items={
-            donutItems.length ? donutItems : [{ label: "Sem dados", value: 1 }]
+            instrumentItems.length
+              ? instrumentItems
+              : [{ label: "Sem dados", value: 1 }]
           }
         />
       </section>
 
       <ColumnChart
-        title="Concentração de Gastos por Área Demandante e Rubrica"
-        groups={columnGroups}
+        title="Realizado, Comprometido e Saldo por Coordenação"
+        subtitle="Concentração financeira das coordenações com maior execução"
+        groups={coordinationGroups}
       />
+
+      <section className="charts-row">
+        <BarList
+          title="Projetos por Total Realizado"
+          subtitle="Ranking de execução financeira"
+          items={topRealizedProjects}
+          limit={10}
+        />
+        <BarList
+          title="Projetos por Valor Contratado"
+          subtitle="Ranking do valor total do instrumento"
+          items={topTotalProjects}
+          limit={10}
+        />
+      </section>
+
+      <section className="dashboard-grid dashboard-grid--support">
+        <BarList
+          title="Ente Financiador"
+          subtitle="Valor total contratado por financiador"
+          items={funderItems}
+          limit={8}
+        />
+        <DonutChart
+          title="Naturezas dos Projetos"
+          subtitle="Valor total contratado por natureza"
+          items={
+            natureItems.length ? natureItems : [{ label: "Sem dados", value: 1 }]
+          }
+        />
+      </section>
+
+      <section className="dashboard-grid dashboard-grid--support">
+        <BarList
+          title="Eixo Mapa Estratégico Fiocruz"
+          subtitle="Valor total contratado por eixo"
+          items={axisItems}
+          limit={6}
+        />
+        <StatusPanel statusItems={statusItems} endYearItems={endYearItems} />
+      </section>
 
       <ProjectTable projects={filteredProjects} />
 
       <section className="ranking-strip">
         <h2>
-          Ranking projetos com maior saldo DI disponível{" "}
-          <span>(Caixa Geral Fiotec)</span>
+          Ranking de projetos com maior saldo disponível{" "}
+          <span>(Saldo total atual)</span>
         </h2>
         <div>
           {balanceRanking.map((project, index) => (
@@ -258,31 +508,46 @@ function App() {
           ))}
         </div>
       </section>
-
-      <section className="detail-panel">
-        <div className="panel-title">
-          <div className="title-dot" />
-          <h2>Detalhes do Projeto</h2>
-        </div>
-        <div className="detail-grid">
-          <FilterSelect
-            label="ID recebido projeto"
-            value={filters.project}
-            onChange={(value) => updateFilter("project", value)}
-            options={projectOptions}
-          />
-          <FilterSelect
-            label="Número do instrumento"
-            value={allOption}
-            onChange={() => {}}
-            options={[
-              allOption,
-              ...new Set(projects.map((project) => project.instrumentNumber)),
-            ]}
-          />
-        </div>
-      </section>
     </main>
+  );
+}
+
+function StatusPanel({ statusItems, endYearItems }) {
+  const maxStatus = Math.max(...statusItems.map((item) => item.value), 1);
+  const maxYear = Math.max(...endYearItems.map((item) => item.value), 1);
+
+  return (
+    <section className="panel status-panel">
+      <div className="panel-title">
+        <div className="title-dot" />
+        <div>
+          <h2>Vigência e Situação</h2>
+          <p>Status calculado pela data final de vigência</p>
+        </div>
+      </div>
+      <div className="status-grid">
+        <div className="status-list">
+          {statusItems.map((item) => (
+            <div className="status-meter" key={item.label}>
+              <span>{item.label}</span>
+              <div>
+                <i style={{ width: `${(item.value / maxStatus) * 100}%` }} />
+              </div>
+              <strong>{item.value}</strong>
+            </div>
+          ))}
+        </div>
+        <div className="year-list">
+          {endYearItems.map((item) => (
+            <article key={item.label}>
+              <span>{item.label}</span>
+              <i style={{ height: `${Math.max((item.value / maxYear) * 100, 6)}%` }} />
+              <strong>{item.value}</strong>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 

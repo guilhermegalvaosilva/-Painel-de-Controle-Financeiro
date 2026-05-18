@@ -132,8 +132,13 @@ function xlsxCell(value, rowIndex, columnIndex, style = 0, type = 'text') {
 }
 
 function makeWorksheet(rows) {
-  const widths = [48, 18, 18, 32, 18, 10, 18, 32, 16, 16, 16, 14]
-  const columns = widths.map((width, index) => `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`).join('')
+  const widths = [18, 48, 62, 28, 18, 22, 24, 34, 22, 28, 16, 16, 42, 18, 18, 18, 18, 18, 18, 18, 18, 14, 16, 14]
+  const columnCount = Math.max(...rows.map((row) => row.length), 1)
+  const columns = Array.from({ length: columnCount }, (_, index) => {
+    const width = widths[index] ?? 18
+    return `<col min="${index + 1}" max="${index + 1}" width="${width}" customWidth="1"/>`
+  }).join('')
+  const lastColumn = columnName(columnCount - 1)
   const xmlRows = rows
     .map((row, rowIndex) => {
       const isHeader = rowIndex === 0
@@ -160,22 +165,34 @@ function makeWorksheet(rows) {
   <sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
   <cols>${columns}</cols>
   <sheetData>${xmlRows}</sheetData>
-  <autoFilter ref="A1:L${rows.length}"/>
+  <autoFilter ref="A1:${lastColumn}${rows.length}"/>
 </worksheet>`
 }
 
 function downloadXlsx(projects) {
   const headers = [
-    'Descrição',
-    'Valor realizado',
-    'Área demandante',
-    'Favorecido',
-    'Projeto',
-    'Meta',
-    'Modalidade',
-    'Rubrica',
-    'Início vigência',
-    'Fim vigência',
+    'Projeto ID Fiotec',
+    'Título do Projeto',
+    'Objetivo Geral',
+    'Coordenador Geral',
+    'Coordenação',
+    'Nº do Processo',
+    'Tipo de Instrumento Contratual',
+    'Ente Financiador',
+    'Nº Instrumento Contratual',
+    'Naturezas Projetos',
+    'Data Início Vigência Projeto',
+    'Data Fim Vigência Projeto',
+    'Eixo Mapa Estratégico Fiocruz',
+    'Valor Total Instrumento Contratual',
+    'Saldo Orçamentário Atual',
+    'Recurso Liberado',
+    'Recurso a Receber',
+    'Total Realizado',
+    'Total Comprometido',
+    'Saldo total Atual',
+    'Rendimentos',
+    'TED de Suporte',
     'Status',
     'Execução',
   ]
@@ -185,16 +202,28 @@ function downloadXlsx(projects) {
     const status = lifecycleStatus(project)
 
     return [
-      { value: project.title },
-      { value: project.realized, type: 'number', style: 4 },
-      { value: project.unit, style: 5 },
-      { value: `${project.coordinator} | ${project.funder}` },
       { value: project.id, style: 6 },
-      { value: Math.max(1, Math.round(execution * 10)), type: 'number' },
+      { value: project.title },
+      { value: project.objective },
+      { value: project.coordinator },
+      { value: project.unit, style: 5 },
+      { value: project.process },
       { value: project.instrumentType },
+      { value: project.funder },
+      { value: project.instrumentNumber },
       { value: project.nature },
       { value: dateShort.format(new Date(`${project.start}T12:00:00`)) },
       { value: dateShort.format(new Date(`${project.end}T12:00:00`)) },
+      { value: project.axis },
+      { value: project.total, type: 'number', style: 4 },
+      { value: project.budgetBalance, type: 'number', style: 4 },
+      { value: project.released, type: 'number', style: 4 },
+      { value: project.receivable, type: 'number', style: 4 },
+      { value: project.realized, type: 'number', style: 4 },
+      { value: project.committed, type: 'number', style: 4 },
+      { value: project.currentBalance, type: 'number', style: 4 },
+      { value: project.earnings, type: 'number', style: 4 },
+      { value: project.supportTed ? 'Sim' : 'Não' },
       { value: status.label, style: status.tone === 'danger' ? 7 : status.tone === 'warning' ? 8 : 9 },
       { value: percent.format(execution), style: 10 },
     ]
@@ -225,7 +254,7 @@ function downloadXlsx(projects) {
       name: 'xl/workbook.xml',
       content: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <sheets><sheet name="Gastos DI 2026" sheetId="1" r:id="rId1"/></sheets>
+  <sheets><sheet name="Base Projetos GEREB" sheetId="1" r:id="rId1"/></sheets>
 </workbook>`,
     },
     {
@@ -289,7 +318,7 @@ function downloadXlsx(projects) {
   const link = document.createElement('a')
 
   link.href = url
-  link.download = `gastos-di-2026-${new Date().toISOString().slice(0, 10)}.xlsx`
+  link.download = `base-projetos-gereb-${new Date().toISOString().slice(0, 10)}.xlsx`
   document.body.append(link)
   link.click()
   link.remove()
@@ -319,8 +348,8 @@ export function ProjectTable({ projects }) {
     <section className="panel table-panel">
       <div className="table-header">
         <div>
-          <h2>Tabela de Gastos DI 2026</h2>
-          <p>Projetos filtrados com valor, área demandante, favorecido e situação financeira.</p>
+          <h2>Base de Projetos GEREB</h2>
+          <p>Projetos filtrados com coordenação, ente financiador, vigência e execução financeira.</p>
         </div>
         <button
           className="export-button"
@@ -335,14 +364,18 @@ export function ProjectTable({ projects }) {
         <table>
           <thead>
             <tr>
-              <th>Descrição</th>
-              <th>Valor (R$)</th>
-              <th>Área demandante</th>
-              <th>Favorecido</th>
+              <th>Título</th>
+              <th>Valor total</th>
+              <th>Liberado</th>
+              <th>Realizado</th>
+              <th>Comprometido</th>
+              <th>Saldo atual</th>
+              <th>Coordenação</th>
+              <th>Coordenador / Ente financiador</th>
               <th>Projeto</th>
-              <th>Meta</th>
-              <th>Modalidade</th>
-              <th>Rubrica</th>
+              <th>Instrumento</th>
+              <th>Natureza</th>
+              <th>TED suporte</th>
               <th>Vigência</th>
               <th>Status</th>
             </tr>
@@ -357,7 +390,11 @@ export function ProjectTable({ projects }) {
                   <td className="description-cell">
                     <span>{project.title}</span>
                   </td>
+                  <td className="money-cell">{brl.format(project.total)}</td>
+                  <td className="money-cell">{brl.format(project.released)}</td>
                   <td className="money-cell">{brl.format(project.realized)}</td>
+                  <td className="money-cell">{brl.format(project.committed)}</td>
+                  <td className="money-cell">{brl.format(project.currentBalance)}</td>
                   <td>
                     <span className="area-pill">{project.unit}</span>
                   </td>
@@ -367,10 +404,14 @@ export function ProjectTable({ projects }) {
                   </td>
                   <td>
                     <strong>{project.id}</strong>
+                    <span>{project.process}</span>
                   </td>
-                  <td>{Math.max(1, Math.round(execution * 10))}</td>
-                  <td>{project.instrumentType}</td>
+                  <td>
+                    <strong>{project.instrumentType}</strong>
+                    <span>{project.instrumentNumber}</span>
+                  </td>
                   <td>{project.nature}</td>
+                  <td>{project.supportTed ? 'Sim' : 'Não'}</td>
                   <td>
                     {dateShort.format(new Date(`${project.start}T12:00:00`))}
                     <span>{dateShort.format(new Date(`${project.end}T12:00:00`))}</span>
