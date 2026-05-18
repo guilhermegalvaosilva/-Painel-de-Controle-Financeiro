@@ -10,9 +10,7 @@ import fiocruzLogo from "./assets/fiocruz-50anos.png";
 import { projects } from "./data/projects";
 import {
   brl,
-  groupByCount,
   groupBySum,
-  lifecycleStatus,
   percent,
   sumBy,
 } from "./utils/formatters";
@@ -190,31 +188,6 @@ function App() {
         }),
     [filteredProjects],
   );
-
-  const statusItems = useMemo(
-    () =>
-      groupByCount(
-        filteredProjects.map((project) => ({
-          ...project,
-          status: lifecycleStatus(project).label,
-        })),
-        "status",
-      ),
-    [filteredProjects],
-  );
-
-  const endYearItems = useMemo(() => {
-    const grouped = new Map();
-
-    filteredProjects.forEach((project) => {
-      const year = project.end ? project.end.slice(0, 4) : "Sem data";
-      grouped.set(year, (grouped.get(year) || 0) + 1);
-    });
-
-    return [...grouped.entries()]
-      .map(([label, value]) => ({ label, value }))
-      .sort((a, b) => String(a.label).localeCompare(String(b.label), "pt-BR"));
-  }, [filteredProjects]);
 
   const balanceRanking = [...filteredProjects]
     .sort((a, b) => b.currentBalance - a.currentBalance)
@@ -533,7 +506,7 @@ function App() {
         />
       </section>
 
-      <section className="dashboard-grid dashboard-grid--support">
+      <section className="dashboard-grid dashboard-grid--support dashboard-grid--single">
         <BarList
           title="Eixo Mapa Estratégico Fiocruz"
           subtitle="Valor total contratado por eixo"
@@ -541,7 +514,6 @@ function App() {
           items={axisItems}
           limit={6}
         />
-        <StatusPanel statusItems={statusItems} endYearItems={endYearItems} />
       </section>
 
       <ProjectTable projects={filteredProjects} />
@@ -652,51 +624,6 @@ function EarningsPage({
         items={earningsByFunder}
         limit={8}
       />
-    </section>
-  );
-}
-
-function StatusPanel({ statusItems, endYearItems }) {
-  const maxStatus = Math.max(...statusItems.map((item) => item.value), 1);
-  const maxYear = Math.max(...endYearItems.map((item) => item.value), 1);
-
-  return (
-    <section className="panel status-panel">
-      <CardHelpButton
-        title="Vigência e Situação"
-        description="Resume a situação dos projetos pela data final de vigência e mostra em quais anos os projetos terminam."
-        detail="Status calculado automaticamente a partir da data final de vigência."
-        value={`${statusItems.length} status e ${endYearItems.length} anos`}
-      />
-      <div className="panel-title">
-        <div className="title-dot" />
-        <div>
-          <h2>Vigência e Situação</h2>
-          <p>Status calculado pela data final de vigência</p>
-        </div>
-      </div>
-      <div className="status-grid">
-        <div className="status-list">
-          {statusItems.map((item) => (
-            <div className="status-meter" key={item.label}>
-              <span>{item.label}</span>
-              <div>
-                <i style={{ width: `${(item.value / maxStatus) * 100}%` }} />
-              </div>
-              <strong>{item.value}</strong>
-            </div>
-          ))}
-        </div>
-        <div className="year-list">
-          {endYearItems.map((item) => (
-            <article key={item.label}>
-              <span>{item.label}</span>
-              <i style={{ height: `${Math.max((item.value / maxYear) * 100, 6)}%` }} />
-              <strong>{item.value}</strong>
-            </article>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

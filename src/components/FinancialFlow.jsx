@@ -10,6 +10,10 @@ export function FinancialFlow({ total, released, receivable, realized, committed
     { label: 'Comprometido', value: committed, tone: 'risk' },
     { label: 'Saldo atual', value: balance, tone: balance < 0 ? 'alert' : 'cash' },
   ]
+  const flowGroups = [
+    { title: 'Contratado e liberação', rows: rows.slice(0, 3) },
+    { title: 'Execução e saldo', rows: rows.slice(3) },
+  ]
   const max = Math.max(...rows.map((row) => Math.abs(row.value)), 1)
   const execution = total ? realized / total : 0
 
@@ -28,15 +32,22 @@ export function FinancialFlow({ total, released, receivable, realized, committed
         </div>
         <strong>{percent.format(execution)} executado</strong>
       </div>
-      <div className="flow-stack">
-        {rows.map((row) => (
-          <div className={`flow-row flow-row--${row.tone}`} key={row.label}>
-            <span>{row.label}</span>
-            <div>
-              <i style={{ width: `${(Math.abs(row.value) / max) * 100}%` }} />
+      <div className="flow-groups">
+        {flowGroups.map((group) => (
+          <article className="flow-card" key={group.title}>
+            <h3>{group.title}</h3>
+            <div className="flow-stack">
+              {group.rows.map((row) => (
+                <div className={`flow-row flow-row--${row.tone}`} key={row.label}>
+                  <span>{row.label}</span>
+                  <div>
+                    <i style={{ width: `${(Math.abs(row.value) / max) * 100}%` }} />
+                  </div>
+                  <strong>{compactBrl.format(row.value)}</strong>
+                </div>
+              ))}
             </div>
-            <strong>{compactBrl.format(row.value)}</strong>
-          </div>
+          </article>
         ))}
       </div>
     </section>
