@@ -1028,46 +1028,55 @@ td span {
 .ranking-strip {
   position: relative;
   margin-top: 18px;
-  padding: 13px 50px 13px 18px;
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background: rgba(244, 249, 252, 0.9);
 }
 
 .ranking-strip h2 {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
 .ranking-strip h2 span {
-  color: #477184;
+  display: block;
+  margin-top: 4px;
+  color: #577e94;
   font-weight: 600;
   text-transform: none;
 }
 
 .ranking-strip > div {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
 }
 
 .ranking-strip article {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 8px 10px;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 8px 12px;
   align-items: center;
-  min-height: 44px;
-  border-radius: 8px;
-  padding: 8px 12px;
-  background: #f7fcff;
+  min-height: 48px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 63, 86, 0.04);
 }
 
 .ranking-strip article strong {
   display: grid;
-  grid-row: span 2;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   place-items: center;
   border-radius: 50%;
   color: var(--blue);
-  background: #e1f0f8;
+  background: #e6f3fb;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 
 .ranking-strip article span,
@@ -1076,6 +1085,17 @@ td span {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.ranking-strip article span {
+  color: #1f475c;
+  font-weight: 600;
+}
+
+.ranking-strip article b {
+  color: #0f3650;
+  font-weight: 800;
+}
+
 
 .earnings-page {
   display: grid;

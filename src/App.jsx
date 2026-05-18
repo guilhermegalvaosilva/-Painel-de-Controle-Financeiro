@@ -519,14 +519,8 @@ function App() {
       <ProjectTable projects={filteredProjects} />
 
       <section className="ranking-strip">
-        <CardHelpButton
-          title="Ranking de projetos com maior saldo disponível"
-          description="Mostra os cinco projetos com maior Saldo total Atual dentro dos filtros aplicados. Ajuda a encontrar onde há mais recurso ainda disponível."
-          detail="Ordenado do maior para o menor saldo atual."
-          value={`${balanceRanking.length} projetos exibidos`}
-        />
         <h2>
-          Ranking de projetos com maior saldo disponível{" "}
+          Ranking de projetos com maior saldo disponível
           <span>(Saldo total atual)</span>
         </h2>
         <div>
