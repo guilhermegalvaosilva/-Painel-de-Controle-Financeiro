@@ -750,12 +750,18 @@
 
 .column-chart {
   display: grid;
-   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-   gap: 14px;
-   min-height: 260px;
-   max-height: 320px;
-   padding: 18px 14px 40px;
-   background: #f8fafc;
+   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+   gap: 16px;
+   min-height: 280px;
+   padding: 18px 16px 44px;
+   background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)),
+     repeating-linear-gradient(
+       to top,
+       transparent,
+       transparent 32px,
+       rgba(226, 232, 240, 0.5) 32px,
+       rgba(226, 232, 240, 0.5) 33px
+     );
  }
  
  .column-group {
@@ -767,11 +773,10 @@
  
  .columns {
    display: grid;
-   grid-template-columns: repeat(3, minmax(16px, 1fr));
-   gap: 8px;
+   grid-template-columns: repeat(3, minmax(20px, 1fr));
+   gap: 10px;
    align-items: end;
-   height: 100%;
-   min-height: 160px;
+   min-height: 180px;
  }
  
  .column-bar {
@@ -785,7 +790,7 @@
  
  .col-value {
    position: absolute;
-   top: -20px;
+   top: -18px;
    left: 50%;
    transform: translateX(-50%);
    color: var(--blue-dark);
@@ -796,26 +801,28 @@
  
  .group-label {
    display: block;
-   margin-top: 4px;
+   margin-top: 8px;
    color: var(--muted);
    font-size: 11px;
    text-align: center;
    overflow: hidden;
    text-overflow: ellipsis;
    white-space: nowrap;
-.table-panel {
-  position: relative;
-  margin-top: 20px;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-
-.table-panel > .card-help {
-  top: 8px;
-  right: 204px;
-}
+ }
+ 
+ .table-panel {
+   position: relative;
+   margin-top: 20px;
+   padding: 0;
+   background: transparent;
+   border: 0;
+   box-shadow: none;
+ }
+ 
+ .table-panel > .card-help {
+   top: 8px;
+   right: 204px;
+ }
 
 .table-header {
   margin: 0 0 8px;
