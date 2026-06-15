@@ -1,11 +1,11 @@
-// Generated from BASE - PROJETOS GEREB - 14.05.2026 1.xlsx
-// Source workbook date: 14/05/2026.
+// Generated from tabela_completa_projetos_fiotec.xlsx
+// Source workbook date: 15/06/2026.
 export const projects = [
     {
         "item":  1,
         "id":  "GEREB-005-FEX-20",
         "title":  "Saúde Digital Para O Enfrentamento Da Covid-19 Nos Territõrios Do Distrito Federal (Fap, Fiotec. Fiocruz)",
-        "objective":  "Apoiar A Execução E O Desenvolvimento De Projetos E Ações De Pesquisa, Inovação E Extensão Voltadas Para: I) O Desenvolvimento E Incorporação De Tecnologias Digitais Para O Diagnóstico, O Tratamento Da Infecção Causada Pelo Covid-19 E A Prevenção Com Maior Precisão Das Ações De Contenção Do Surto Nos Territórios; Ii) Capacitação Da Força De Trabalho Para Atuar No Ambiente De Saúde Digital E, Iii) Fomento Da Rede Cooperativa De Ciência E Tecnologia Da Cadeia De Inovação Digital Do Df Para O Desenvolvimento De Pesquisas Tecnológicas De Enfrentamento De Doenças Infectocontagiosas, Contribuindo Para A Cooperação Entre A Fiocruz, A Secretaria De Estado De Saúde Do Distrito Federa, A Fap/Df E Outros Parceiros.",
+        "objective":  "Apoiar A Execução E O Desenvolvimento De Projetos E Ações De Pesquisa, Inovação E Extensão Voltadas Para:  I) O Desenvolvimento E Incorporação De Tecnologias Digitais Para O Diagnóstico, O Tratamento Da Infecção Causada Pelo Covid-19 E A Prevenção Com Maior Precisão Das Ações De Contenção Do Surto Nos Territórios; Ii) Capacitação Da Força De Trabalho Para Atuar No Ambiente De Saúde Digital E, Iii) Fomento Da Rede Cooperativa De Ciência E Tecnologia Da Cadeia De Inovação Digital Do Df Para O Desenvolvimento De Pesquisas Tecnológicas De Enfrentamento De Doenças Infectocontagiosas, Contribuindo Para A Cooperação Entre A Fiocruz, A Secretaria De Estado De Saúde Do Distrito Federa, A Fap/Df E Outros Parceiros.",
         "coordinator":  "Wagner de Jesus Martins",
         "unit":  "COLABORATÓRIO",
         "process":  "25027.000032/2020-90",
@@ -205,7 +205,7 @@ export const projects = [
         "item":  9,
         "id":  "GEREB-024-FIO-22",
         "title":  "Programa De Formação A Distância Destinado A Profissionais E Gestores Do Setor De Saúde Que Atuam Nas Políticas De Promoção De Equidade Em Saúde.",
-        "objective":  "Desenvolver Um Programa Educacional À Distância Pelo Sistema Una-Sus Destinado A Profissionais E Gestores Do Setor De Saúde Voltado Para As Seguintes Políticas De Equidade Em Saúde: I)Da População Negra; Ii)Das Pessoas Com Albinismo; Iii)Da População Quilombola; Iv)Do Povo Cigano/Romani; V)De Adolescentes Em Conflito Com A Lei; Vi)De Imigrantes, Refugiados E Apátridas; Vii)Das Populações Itinerantes; Viii)Dos Direitos Humanos E Saúde; E Ix)Da Gestão E Implantação De Políticas De Equidade No Sus.",
+        "objective":  "Desenvolver Um Programa Educacional À Distância Pelo Sistema Una-Sus Destinado A Profissionais E Gestores Do Setor De Saúde Voltado Para As Seguintes Políticas De Equidade Em Saúde:  I)Da População Negra; Ii)Das Pessoas Com Albinismo; Iii)Da População Quilombola; Iv)Do Povo Cigano/Romani; V)De Adolescentes Em Conflito Com A Lei; Vi)De Imigrantes, Refugiados E Apátridas; Vii)Das Populações Itinerantes; Viii)Dos Direitos Humanos E Saúde; E Ix)Da Gestão E Implantação De Políticas De Equidade No Sus.",
         "coordinator":  "Kellen Cristina Da Silva Gasque",
         "unit":  "UNASUS",
         "process":  "25027.000081/2022-94",
@@ -1255,7 +1255,7 @@ export const projects = [
         "item":  51,
         "id":  "GEREB-043-FIO-24",
         "title":  "Territórios Sustentáveis E Saudáveis Nas Periferias – Cmp/Sp",
-        "objective":  "\"Promover A Saúde Das Populações Vulnerabilizadas, Prioritariamente, Alicerçando-Se Na Tecnociência Solidária E Nas Práticas Integrativa E Complementares Em Saúde Para O Enfrentamento Da Fome E A Insegurança Alimentar E Nutricional Nos Territórios Urbanos.\"",
+        "objective":  "Promover A Saúde Das Populações Vulnerabilizadas, Prioritariamente, Alicerçando-Se Na Tecnociência Solidária E Nas Práticas Integrativa E Complementares Em Saúde Para O Enfrentamento Da Fome E A Insegurança Alimentar E Nutricional Nos Territórios Urbanos.",
         "coordinator":  "Wagner de Jesus Martins",
         "unit":  "COLABORATÓRIO",
         "process":  "25027.000285/2024-97",
@@ -1605,7 +1605,7 @@ export const projects = [
         "item":  65,
         "id":  "GEREB-046-FIO-24",
         "title":  "Conexões De Saberes Iii – Ações De Formação, Pesquisa, Inovação Tecnológica E Aplicação Referenciadas Na Educação Popular Em Saúde E Na Promoção Da Equidade",
-        "objective":  "Implementar Processos Educativos, De Pesquisa, Inovação Tecnológica E Promoção Da Equidade, Referenciados Na Educação Popular Em Saúde, Contribuindo Com O Resgate E Implementação Da Política Nacional De Educação Popular Em Saúde No Sistema Único De Saúde, Contribuindo Com A Estruturação De Uma Rede De Educadores(As) Implicados(As) Com A Defesa Do Sus, Da Democracia E Da Equidade.",
+        "objective":  "Implementar Processos Educativos, De Pesquisa, Inovação  Tecnológica E Promoção Da Equidade, Referenciados Na Educação Popular Em Saúde, Contribuindo Com O Resgate E Implementação Da  Política Nacional De Educação Popular Em Saúde No Sistema Único De Saúde, Contribuindo Com A Estruturação De Uma Rede De  Educadores(As) Implicados(As) Com A Defesa Do Sus, Da Democracia E Da Equidade.",
         "coordinator":  "Osvaldo Peralta Bonetti",
         "unit":  "ANGICOS",
         "process":  "25027.000270/2024-29",

@@ -1,7 +1,7 @@
 import { compactBrl } from '../utils/formatters'
 import { CardHelpButton } from './CardHelpButton'
 
-const palette = ['#d54b3f', '#f0a31a', '#4dd4cf', '#514fe0', '#b542d6']
+const palette = ['#2EA6A1', '#77C6CC', '#124986']
 
 export function ColumnChart({ title, subtitle, groups, info }) {
   const rubrics = ['Realizado', 'Comprometido', 'Saldo']
@@ -37,7 +37,8 @@ export function ColumnChart({ title, subtitle, groups, info }) {
               {group.values.map((value, index) => (
                 <div
                   key={`${group.label}-${rubrics[index]}`}
-                  className="column-bar"
+                  className="column-bar has-tooltip"
+                  data-tooltip={`${group.label} · ${rubrics[index]}: ${compactBrl.format(value)}`}
                   title={`${rubrics[index]}: ${compactBrl.format(value)}`}
                   style={{
                     height: `${Math.max((value / max) * 100, value > 0 ? 4 : 0)}%`,

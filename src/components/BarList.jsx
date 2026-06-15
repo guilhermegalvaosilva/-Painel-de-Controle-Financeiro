@@ -2,7 +2,16 @@ import { useState } from 'react'
 import { compactBrl } from '../utils/formatters'
 import { CardHelpButton } from './CardHelpButton'
 
-export function BarList({ title, subtitle, items, valueType = 'money', limit = 7, info, expandable = false }) {
+export function BarList({
+  title,
+  subtitle,
+  items,
+  valueType = 'money',
+  limit = 7,
+  info,
+  expandable = false,
+  wideLabels = false,
+}) {
   const [expanded, setExpanded] = useState(false)
   const visible = items.slice(0, expanded ? items.length : limit)
   const max = Math.max(...visible.map((item) => Math.abs(item.value)), 1)
@@ -30,7 +39,7 @@ export function BarList({ title, subtitle, items, valueType = 'money', limit = 7
       </div>
       <div className="ranking-chart">
         {visible.map((item) => (
-          <div className="ranking-row" key={item.label}>
+          <div className={wideLabels ? 'ranking-row ranking-row--wide-label' : 'ranking-row'} key={item.label}>
             <span>{item.label}</span>
             <div className="ranking-track">
               <i style={{ width: `${(Math.abs(item.value) / max) * 100}%` }} />

@@ -29,6 +29,85 @@ const optionList = (values) => [
   ),
 ];
 
+function groupFinancials(items, groupKey) {
+  const groups = new Map();
+
+  items.forEach((project) => {
+    const label = project[groupKey] || "Não informado";
+    const current = groups.get(label) || {
+      label,
+      value: 0,
+      detailValue: 0,
+      committedValue: 0,
+      balanceValue: 0,
+      count: 0,
+    };
+
+    current.value += Number(project.total || 0);
+    current.detailValue += Number(project.realized || 0);
+    current.committedValue += Number(project.committed || 0);
+    current.balanceValue += Number(project.currentBalance || 0);
+    current.count += 1;
+    groups.set(label, current);
+  });
+
+  return [...groups.values()]
+    .sort((a, b) => b.value - a.value)
+    .map((item) => ({
+      ...item,
+      detailLabel: "Realizado",
+      meta: `${percent.format(item.value ? item.detailValue / item.value : 0)} executado`,
+    }));
+}
+
+const instrumentOrder = [
+  "CONVÊNIO PD&I",
+  "TED",
+  "EMENDA PARLAMENTAR",
+  "LOA",
+  "CARTA ACORDO",
+  "DISPENSA DE TED",
+];
+
+const instrumentColors = {
+  "CONVÊNIO PD&I": "#124986",
+  TED: "#2EA6A1",
+  "EMENDA PARLAMENTAR": "#77C6CC",
+  LOA: "#8DA0B4",
+  "CARTA ACORDO": "#1B2D4A",
+  "DISPENSA DE TED": "#0F4C8A",
+};
+
+function normalizeInstrumentType(value) {
+  if (value === "EMENDAS") return "EMENDA PARLAMENTAR";
+  return value || "Não informado";
+}
+
+function groupInstrumentTypes(items) {
+  const groups = new Map();
+
+  items.forEach((project) => {
+    const label = normalizeInstrumentType(project.instrumentType);
+    const current = groups.get(label) || {
+      label,
+      value: 0,
+      color: instrumentColors[label],
+    };
+
+    current.value += 1;
+    groups.set(label, current);
+  });
+
+  const knownGroups = instrumentOrder
+    .map((label) => groups.get(label))
+    .filter(Boolean);
+  const remainingGroups = [...groups.values()]
+    .filter((item) => !instrumentOrder.includes(item.label))
+    .sort((a, b) => b.value - a.value);
+
+  return [...knownGroups, ...remainingGroups];
+}
+
 const projectOptions = [allOption, ...projects.map((project) => project.id)];
 const modalityOptions = optionList(
   projects.map((project) => project.instrumentType),
@@ -42,7 +121,6 @@ const instrumentOptions = optionList(
 );
 
 function App() {
-  const [activePage, setActivePage] = useState("dashboard");
   const [filters, setFilters] = useState({
     project: allOption,
     modality: allOption,
@@ -119,7 +197,6 @@ function App() {
         realized: sumBy(filteredProjects, "realized"),
         committed: sumBy(filteredProjects, "committed"),
         balance: sumBy(filteredProjects, "currentBalance"),
-        earnings: sumBy(filteredProjects, "earnings"),
         supportTedCount,
         closed,
       };
@@ -143,18 +220,17 @@ function App() {
     () =>
       [...filteredProjects]
         .sort((a, b) => b.total - a.total)
-        .slice(0, 10)
         .map((project) => ({ label: project.id, value: project.total })),
     [filteredProjects],
   );
 
   const instrumentItems = useMemo(
-    () => groupBySum(filteredProjects, "instrumentType", "total").slice(0, 6),
+    () => groupInstrumentTypes(filteredProjects),
     [filteredProjects],
   );
 
   const natureItems = useMemo(
-    () => groupBySum(filteredProjects, "nature", "total").slice(0, 6),
+    () => groupFinancials(filteredProjects, "nature"),
     [filteredProjects],
   );
 
@@ -192,29 +268,6 @@ function App() {
   const balanceRanking = [...filteredProjects]
     .sort((a, b) => b.currentBalance - a.currentBalance)
     .slice(0, 5);
-
-  const earningsProjects = useMemo(
-    () =>
-      [...filteredProjects]
-        .sort((a, b) => b.earnings - a.earnings)
-        .map((project) => ({ label: project.id, value: project.earnings })),
-    [filteredProjects],
-  );
-
-  const earningsByCoordination = useMemo(
-    () => groupBySum(filteredProjects, "unit", "earnings").slice(0, 10),
-    [filteredProjects],
-  );
-
-  const earningsByFunder = useMemo(
-    () => groupBySum(filteredProjects, "funder", "earnings").slice(0, 8),
-    [filteredProjects],
-  );
-
-  const positiveEarningsCount = filteredProjects.filter(
-    (project) => project.earnings > 0,
-  ).length;
-  const topEarningProject = earningsProjects[0];
 
   const portfolioStats = [
     {
@@ -271,27 +324,13 @@ function App() {
           <img className="brand-logo" src={fiocruzLogo} alt="Fiocruz Brasília" />
           <div>
             <h1>Painel de Projetos GEREB</h1>
-            <p>Base Excel de 2026</p>
+            <p>Márcio Aldrin França Cavalcante</p>
           </div>
         </div>
         <div className="topbar-actions">
-          <button
-            type="button"
-            className={activePage === "dashboard" ? "nav-button is-active" : "nav-button"}
-            onClick={() => setActivePage("dashboard")}
-          >
-            Dashboard
-          </button>
-          <button
-            type="button"
-            className={activePage === "earnings" ? "nav-button is-active" : "nav-button"}
-            onClick={() => setActivePage("earnings")}
-          >
-            Rendimentos
-          </button>
           <div className="source-badge">
             <span>{projects.length} projetos</span>
-            <strong>23 campos da planilha</strong>
+           
           </div>
         </div>
       </header>
@@ -369,8 +408,6 @@ function App() {
         </div>
       </section>
 
-      {activePage === "dashboard" ? (
-        <>
       <section className="portfolio-band" aria-label="Resumo da carteira">
         {portfolioStats.map((stat) => (
           <article
@@ -398,13 +435,7 @@ function App() {
           detail="Soma contratual"
           tone="blue"
         />
-        <MetricCard
-          label="Saldo orçamentário atual"
-          value={totals.budgetBalance}
-          info="Soma da coluna Saldo Orçamentário Atual."
-          detail="Campo da planilha"
-          tone="teal"
-        />
+       
         <MetricCard
           label="Recurso liberado"
           value={totals.released}
@@ -452,14 +483,15 @@ function App() {
           balance={totals.balance}
         />
         <DonutChart
-          title="Carteira por Tipo de Instrumento"
-          subtitle="Valor total do instrumento contratual"
-          info="Mostra por qual tipo de instrumento contratual o valor total da carteira está concentrado. Ajuda a identificar a dependência da carteira em TED, convênios, emendas e outros formatos."
+          title="Tipos de Instrumentos"
+          info="Mostra a distribuição dos projetos por tipo de instrumento contratual."
           items={
             instrumentItems.length
               ? instrumentItems
               : [{ label: "Sem dados", value: 1 }]
           }
+          detailTitle="Detalhamento"
+          valueType="count"
         />
       </section>
 
@@ -478,6 +510,7 @@ function App() {
           items={topRealizedProjects}
           limit={10}
           expandable
+          wideLabels
         />
         <BarList
           title="Projetos por Valor Contratado"
@@ -485,6 +518,8 @@ function App() {
           info="Lista os maiores projetos pelo valor total contratado. Ajuda a separar porte contratual de execução financeira."
           items={topTotalProjects}
           limit={10}
+          expandable
+          wideLabels
         />
       </section>
 
@@ -533,92 +568,7 @@ function App() {
           ))}
         </div>
       </section>
-        </>
-      ) : (
-        <EarningsPage
-          totals={totals}
-          projects={filteredProjects}
-          topProject={topEarningProject}
-          positiveCount={positiveEarningsCount}
-          earningsProjects={earningsProjects}
-          earningsByCoordination={earningsByCoordination}
-          earningsByFunder={earningsByFunder}
-        />
-      )}
     </main>
-  );
-}
-
-function EarningsPage({
-  totals,
-  projects,
-  topProject,
-  positiveCount,
-  earningsProjects,
-  earningsByCoordination,
-  earningsByFunder,
-}) {
-  return (
-    <section className="earnings-page" aria-label="Página de rendimentos">
-      <div className="page-heading">
-        <div>
-          <h2>Rendimentos</h2>
-          <p>Leitura específica da coluna Rendimentos para os projetos filtrados.</p>
-        </div>
-        <span>{projects.length} projetos no recorte</span>
-      </div>
-
-      <section className="kpi-row kpi-row--financial">
-        <MetricCard
-          label="Rendimentos totais"
-          value={totals.earnings}
-          info="Soma da coluna Rendimentos para todos os projetos do filtro atual."
-          detail="Acumulado do recorte"
-          tone={totals.earnings < 0 ? "red" : "blue"}
-        />
-        <MetricCard
-          label="Projetos com rendimento"
-          value={positiveCount}
-          info="Quantidade de projetos com valor positivo na coluna Rendimentos."
-          detail={`${percent.format(projects.length ? positiveCount / projects.length : 0)} da seleção`}
-          tone="green"
-          format="plain"
-        />
-        <MetricCard
-          label="Maior rendimento"
-          value={topProject?.value || 0}
-          info="Projeto com maior valor de rendimento dentro dos filtros aplicados."
-          detail={topProject?.label || "Sem projeto"}
-          tone="amber"
-        />
-      </section>
-
-      <section className="charts-row">
-        <BarList
-          title="Projetos por Rendimentos"
-          subtitle="Ranking da coluna Rendimentos"
-          info="Mostra todos os projetos ordenados pelo valor de rendimentos. Use Ver mais para expandir a lista completa do recorte."
-          items={earningsProjects}
-          limit={12}
-          expandable
-        />
-        <BarList
-          title="Rendimentos por Coordenação"
-          subtitle="Soma de rendimentos por coordenação"
-          info="Agrupa os rendimentos por coordenação para identificar onde os rendimentos estão mais concentrados."
-          items={earningsByCoordination}
-          limit={10}
-        />
-      </section>
-
-      <BarList
-        title="Rendimentos por Ente Financiador"
-        subtitle="Soma de rendimentos por financiador"
-        info="Agrupa os rendimentos por ente financiador, ajudando a identificar a origem institucional dos maiores rendimentos."
-        items={earningsByFunder}
-        limit={8}
-      />
-    </section>
   );
 }
 
