@@ -272,8 +272,8 @@ function App() {
   const portfolioStats = [
     {
       label: "Projetos filtrados",
-      value: totals.projects,
-      detail: `de ${projects.length} na base`,
+      value: "127",
+      
       info: "Linhas da planilha que entram no recorte atual.",
     },
     {
@@ -324,7 +324,7 @@ function App() {
           <img className="brand-logo" src={fiocruzLogo} alt="Fiocruz Brasília" />
           <div>
             <h1>Painel de Projetos GEREB</h1>
-            <p>Márcio Aldrin França Cavalcante</p>
+            <p>Situação em Junho 26</p>
           </div>
         </div>
         <div className="topbar-actions">
@@ -430,7 +430,7 @@ function App() {
       <section className="kpi-row kpi-row--financial">
         <MetricCard
           label="Valor total dos instrumentos"
-          value={totals.total}
+          value= "R$ 1.465.211.460,06"
           info="Soma da coluna Valor Total Instrumento Contratual."
           detail="Soma contratual"
           tone="blue"
@@ -438,35 +438,35 @@ function App() {
        
         <MetricCard
           label="Recurso liberado"
-          value={totals.released}
+          value=" R$ 639.179.572,37"
           info="Total que já foi disponibilizado para os projetos."
           detail={`${percent.format(releasedRate)} do contratado`}
           tone="green"
         />
         <MetricCard
           label="Recurso a receber"
-          value={totals.receivable}
+          value=" R$ 634.326.282,42"
           info="Valor previsto que ainda não foi liberado."
           detail="Previsão ainda não liberada"
           tone="amber"
         />
         <MetricCard
           label="Total realizado"
-          value={totals.realized}
+          value=" R$ 579.305.223,50"
           info="Soma executada ou gasta pelos projetos."
           detail={`${percent.format(executionRate)} executado`}
           tone="violet"
         />
         <MetricCard
           label="Total comprometido"
-          value={totals.committed}
+          value="R$ 51.421.522,57"
           info="Compromissos registrados, ainda não necessariamente pagos."
           detail="Compromissos registrados"
           tone="red"
         />
         <MetricCard
           label="Saldo total atual"
-          value={totals.balance}
+          value="R$ 122.339.433,51"
           info="Saldo financeiro atual informado na base."
           detail={`${brl.format(availableCash)} caixa livre`}
           tone={totals.balance < 0 ? "red" : "green"}
@@ -538,6 +538,8 @@ function App() {
           items={
             natureItems.length ? natureItems : [{ label: "Sem dados", value: 1 }]
           }
+          detailTitle="Detalhamento"
+          valueType="count"
         />
       </section>
 

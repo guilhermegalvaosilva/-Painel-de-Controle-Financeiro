@@ -89,12 +89,6 @@ export function DonutChart({ title, subtitle, items, info, detailTitle, valueTyp
               <title>{item.tooltip}</title>
             </circle>
           ))}
-          <text className="donut__count" x="21" y="20" textAnchor="middle">
-            {items.length}
-          </text>
-          <text className="donut__caption" x="21" y="25" textAnchor="middle">
-            grupos
-          </text>
         </svg>
         {isDetailChart ? (
           <div className="donut-detail">
