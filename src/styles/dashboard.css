@@ -28,6 +28,7 @@
 }
 
 .topbar,
+.filter-shell,
 .filter-panel,
 .metric-card,
 .panel,
@@ -164,13 +165,74 @@
   line-height: 1;
 }
 
+.filter-shell {
+  margin-top: 14px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.filter-summary {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+}
+
+.filter-summary strong {
+  display: block;
+  color: var(--blue-dark);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.filter-summary span {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.filter-toggle {
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 14px;
+  color: var(--blue-dark);
+  background: var(--ice);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.filter-toggle:hover {
+  border-color: var(--blue);
+  color: var(--ice);
+  background: var(--blue);
+}
+
 .filter-panel {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   align-items: end;
-  margin-top: 14px;
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+  padding: 0 16px;
+  border-top: 1px solid rgba(189, 207, 213, 0.55);
+  opacity: 0;
+  transition:
+    max-height 0.24s ease,
+    opacity 0.18s ease;
+}
+
+.filter-panel.is-open {
+  max-height: 520px;
   padding: 13px 16px;
+  opacity: 1;
 }
 
 .filter-control {
@@ -647,87 +709,6 @@
   background: var(--soft);
   font-size: 11px;
   white-space: nowrap;
-}
-
-.flow-stack {
-  display: grid;
-  gap: 11px;
-}
-
-.flow-groups {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.flow-card {
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px;
-  background: var(--ice);
-}
-
-.flow-card h3 {
-  margin: 0 0 11px;
-  color: var(--blue-dark);
-  font-size: 12px;
-  line-height: 1.2;
-}
-
-.flow-row {
-  display: grid;
-  grid-template-columns: 130px minmax(0, 1fr) 86px;
-  gap: 10px;
-  align-items: center;
-}
-
-.flow-row span {
-  overflow: hidden;
-  color: var(--detail);
-  font-size: 11px;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.flow-row div {
-  height: 14px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--soft);
-}
-
-.flow-row i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--blue);
-}
-
-.flow-row strong {
-  color: var(--detail);
-  font-size: 11px;
-  text-align: right;
-  white-space: nowrap;
-}
-
-.flow-row--good i,
-.flow-row--cash i {
-  background: var(--green);
-}
-
-.flow-row--wait i {
-  background: var(--aqua);
-}
-
-.flow-row--done i {
-  background: var(--muted);
-}
-
-.flow-row--risk i,
-.flow-row--alert i {
-  background: var(--detail);
 }
 
 .ranking-chart {
@@ -1315,6 +1296,79 @@
   box-shadow: inset 0 0 0 1px rgba(246, 248, 250, 0.55);
 }
 
+.project-card-list {
+  display: none;
+}
+
+.project-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px;
+  background: var(--ice);
+}
+
+.project-card__heading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-card__heading > strong {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.project-card h3 {
+  margin: 10px 0 12px;
+  color: var(--blue-dark);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.project-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.project-card dl div {
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--surface);
+}
+
+.project-card dt {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.project-card dd {
+  margin: 3px 0 0;
+  color: var(--blue-dark);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.project-card p,
+.project-card small {
+  display: block;
+  margin: 10px 0 0;
+  color: var(--detail);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.project-card small {
+  margin-top: 3px;
+  color: var(--muted);
+}
+
 table {
   width: 100%;
   min-width: 1680px;
@@ -1580,7 +1634,6 @@ td span {
 
   .charts-row,
   .dashboard-grid,
-  .flow-groups,
   .ranking-strip > div {
     grid-template-columns: 1fr;
   }
@@ -1652,6 +1705,7 @@ td span {
   }
 
   .topbar,
+  .filter-shell,
   .filter-panel,
   .metric-card,
   .panel,
@@ -1692,14 +1746,6 @@ td span {
 
   .filter-actions button {
     width: 100%;
-  }
-
-  .flow-row {
-    grid-template-columns: 1fr;
-  }
-
-  .flow-row strong {
-    text-align: left;
   }
 
   .column-chart {
@@ -1772,6 +1818,15 @@ td span {
     width: 100%;
     margin-left: 0;
     text-align: center;
+  }
+
+  .table-wrap {
+    display: none;
+  }
+
+  .project-card-list {
+    display: grid;
+    gap: 10px;
   }
 }
 

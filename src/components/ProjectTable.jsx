@@ -433,6 +433,42 @@ export function ProjectTable({ projects }) {
           </tbody>
         </table>
       </div>
+      <div className="project-card-list" aria-label="Projetos em cards">
+        {visibleProjects.map((project) => {
+          const execution = project.total ? project.realized / project.total : 0
+          const status = lifecycleStatus(project)
+
+          return (
+            <article className="project-card" key={`${project.id}-card`}>
+              <div className="project-card__heading">
+                <strong>{project.id}</strong>
+                <span className={`status status--${status.tone}`}>{status.label}</span>
+              </div>
+              <h3>{project.title}</h3>
+              <dl>
+                <div>
+                  <dt>Total</dt>
+                  <dd>{brl.format(project.total)}</dd>
+                </div>
+                <div>
+                  <dt>Realizado</dt>
+                  <dd>{brl.format(project.realized)}</dd>
+                </div>
+                <div>
+                  <dt>Saldo</dt>
+                  <dd>{brl.format(project.currentBalance)}</dd>
+                </div>
+                <div>
+                  <dt>Execu??o</dt>
+                  <dd>{percent.format(execution)}</dd>
+                </div>
+              </dl>
+              <p>{project.coordinator}</p>
+              <small>{project.funder}</small>
+            </article>
+          )
+        })}
+      </div>
       <div className="pager" aria-label="Paginação da tabela">
         <button type="button" onClick={() => goToPage(1)} disabled={activePage === 1}>
           First

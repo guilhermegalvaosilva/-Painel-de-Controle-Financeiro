@@ -122,6 +122,7 @@ const instrumentOptions = optionList(
 );
 
 function App() {
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
     project: allOption,
     modality: allOption,
@@ -204,6 +205,9 @@ function App() {
   const executionRate = totals.total ? totals.realized / totals.total : 0;
   const releasedRate = totals.total ? totals.released / totals.total : 0;
   const availableCash = totals.released - totals.realized - totals.committed;
+  const activeFilterCount = Object.values(filters).filter(
+    (value) => value && value !== allOption,
+  ).length;
 
   const topRealizedProjects = useMemo(
     () =>
@@ -331,7 +335,26 @@ function App() {
         </div>
       </header>
 
-      <section className="filter-panel" aria-label="Filtros da base GEREB">
+      <section className="filter-shell" aria-label="Filtros da base GEREB">
+        <div className="filter-summary">
+          <div>
+            <strong>Filtros</strong>
+            <span>
+              {activeFilterCount
+                ? `${activeFilterCount} filtro${activeFilterCount > 1 ? "s" : ""} ativo${activeFilterCount > 1 ? "s" : ""}`
+                : "Nenhum filtro ativo"}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="filter-toggle"
+            aria-expanded={filtersOpen}
+            onClick={() => setFiltersOpen((current) => !current)}
+          >
+            {filtersOpen ? "Ocultar" : "Mostrar"}
+          </button>
+        </div>
+        <div className={filtersOpen ? "filter-panel is-open" : "filter-panel"}>
         <FilterSelect
           label="Projeto"
           value={filters.project}
@@ -395,6 +418,7 @@ function App() {
           <button type="button" onClick={resetFilters}>
             Limpar
           </button>
+        </div>
         </div>
       </section>
 
