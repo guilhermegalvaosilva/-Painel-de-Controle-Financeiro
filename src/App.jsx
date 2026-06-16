@@ -6,7 +6,7 @@ import { DonutChart } from "./components/DonutChart";
 import { MetricCard } from "./components/MetricCard";
 import { ProjectTable } from "./components/ProjectTable";
 import { ResourceDistribution } from "./components/ResourceDistribution";
-import fiocruzLogo from "./assets/fiocruz-logo.svg";
+import fiocruzLogo from "./assets/Captura de tela 2026-04-14 121940.png";
 import { projects } from "./data/projects";
 import {
   brl,

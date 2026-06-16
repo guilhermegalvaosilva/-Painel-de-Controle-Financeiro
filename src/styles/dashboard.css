@@ -74,11 +74,12 @@
 }
 
 .brand-logo {
-  width: 172px;
-  height: 96px;
+  width: 210px;
+  height: 58px;
   flex: 0 0 auto;
   object-fit: contain;
   object-position: center;
+  border-radius: 6px;
 }
 
 .brandline h1 {
@@ -1668,8 +1669,8 @@ td span {
   }
 
   .brand-logo {
-    width: 154px;
-    height: 86px;
+    width: 180px;
+    height: 48px;
   }
 
   .source-badge {
@@ -1780,8 +1781,8 @@ td span {
   }
 
   .brand-logo {
-    width: 132px;
-    height: 74px;
+    width: min(170px, 64vw);
+    height: auto;
   }
 
   .metric-card strong,
