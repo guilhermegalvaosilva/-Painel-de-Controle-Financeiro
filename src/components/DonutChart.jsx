@@ -3,6 +3,12 @@ import { compactBrl } from '../utils/formatters'
 import { CardHelpButton } from './CardHelpButton'
 
 const colors = ['#2EA6A1', '#124986', '#77C6CC', '#5F7A8D', '#8DA0B4', '#BDCFD5', '#1E7F76']
+const fullBrl = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 const shareFormatter = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 1,
   minimumFractionDigits: 1,
@@ -16,7 +22,17 @@ function formatCount(value) {
   return `${value} projeto${value === 1 ? '' : 's'}`
 }
 
-export function DonutChart({ title, subtitle, items, info, detailTitle, valueType = 'money' }) {
+export function DonutChart({
+  title,
+  subtitle,
+  items,
+  info,
+  detailTitle,
+  valueType = 'money',
+  showDetailFacts = true,
+  showDetailCount = false,
+  showDetailTotal = false,
+}) {
   const [activeSlice, setActiveSlice] = useState(null)
   const total = items.reduce((sum, item) => sum + item.value, 0)
   const safeTotal = total || 1
@@ -31,6 +47,10 @@ export function DonutChart({ title, subtitle, items, info, detailTitle, valueTyp
     const midpointAngle = midpoint * Math.PI * 2 - Math.PI / 2
     const shareLabel = `${shareFormatter.format(dash)}%`
     const valueLabel = isCountChart ? formatCount(item.value) : compactBrl.format(item.value)
+    const detailTotalValue = typeof item.detailTotalValue === 'number' ? item.detailTotalValue : item.value
+    const detailTotalLabel = fullBrl.format(detailTotalValue)
+    const detailCountValue = typeof item.count === 'number' ? item.count : isCountChart ? item.value : null
+    const detailCountLabel = typeof detailCountValue === 'number' ? formatCount(detailCountValue) : null
     const realizedLabel = formatOptionalMoney(item.detailValue)
     const committedLabel = formatOptionalMoney(item.committedValue)
     const balanceLabel = formatOptionalMoney(item.balanceValue)
@@ -60,6 +80,8 @@ export function DonutChart({ title, subtitle, items, info, detailTitle, valueTyp
       realizedLabel,
       shareLabel,
       detailFacts,
+      detailCountLabel,
+      detailTotalLabel,
       popupX: 50 + 34 * Math.cos(midpointAngle),
       popupY: 50 + 34 * Math.sin(midpointAngle),
       tooltip: tooltipParts.join(' | '),
@@ -143,7 +165,18 @@ export function DonutChart({ title, subtitle, items, info, detailTitle, valueTyp
                 <i style={{ background: item.color }} />
                 <span>{item.label}</span>
                 <div className="donut-detail__values">
+                  {showDetailTotal ? <strong className="donut-detail__total">{item.detailTotalLabel}</strong> : null}
+                  {showDetailCount && item.detailCountLabel ? (
+                    <small className="donut-detail__count">{item.detailCountLabel}</small>
+                  ) : null}
                   <b>{item.shareLabel}</b>
+                  {showDetailFacts && item.detailFacts.length ? (
+                    <div className="donut-detail__facts">
+                      {item.detailFacts.map((fact) => (
+                        <small key={fact}>{fact}</small>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ))}

@@ -2,6 +2,13 @@ import { useState } from 'react'
 import { compactBrl } from '../utils/formatters'
 import { CardHelpButton } from './CardHelpButton'
 
+const fullBrl = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
 export function BarList({
   title,
   subtitle,
@@ -10,12 +17,18 @@ export function BarList({
   limit = 7,
   info,
   expandable = false,
+  fullValues = false,
+  roomyLabels = false,
   wideLabels = false,
 }) {
   const [expanded, setExpanded] = useState(false)
   const visible = items.slice(0, expanded ? items.length : limit)
   const max = Math.max(...visible.map((item) => Math.abs(item.value)), 1)
   const canExpand = expandable && items.length > limit
+  const formatValue = (value) => {
+    if (valueType !== 'money') return value
+    return fullValues ? fullBrl.format(value) : compactBrl.format(value)
+  }
 
   return (
     <section className="panel chart-panel">
@@ -39,12 +52,19 @@ export function BarList({
       </div>
       <div className="ranking-chart">
         {visible.map((item) => (
-          <div className={wideLabels ? 'ranking-row ranking-row--wide-label' : 'ranking-row'} key={item.label}>
+          <div
+            className={[
+              'ranking-row',
+              wideLabels ? 'ranking-row--wide-label' : '',
+              roomyLabels ? 'ranking-row--roomy-label' : '',
+            ].filter(Boolean).join(' ')}
+            key={item.label}
+          >
             <span>{item.label}</span>
             <div className="ranking-track">
               <i style={{ width: `${(Math.abs(item.value) / max) * 100}%` }} />
             </div>
-            <strong>{valueType === 'money' ? compactBrl.format(item.value) : item.value}</strong>
+            <strong>{formatValue(item.value)}</strong>
           </div>
         ))}
       </div>

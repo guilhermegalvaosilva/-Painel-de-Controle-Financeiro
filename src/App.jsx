@@ -78,6 +78,29 @@ const instrumentColors = {
   "DISPENSA DE TED": "#0F4C8A",
 };
 
+const strategicAxisItems = [
+  {
+    label: "AtenÃ§Ã£o, PromoÃ§Ã£o, VigilÃ¢ncias, GeraÃ§Ã£o De Conhecimentos E FormaÃ§Ã£o Para O Sus",
+    value: 1005587479.05,
+  },
+  {
+    label: "CiÃªncia, Tecnologia, SaÃºde E Sociedade",
+    value: 389364521.01,
+  },
+  {
+    label: "InovaÃ§Ã£o E Complexo Produtivo Em SaÃºde",
+    value: 25092610,
+  },
+  {
+    label: "SaÃºde E Sustentabilidade Socioambiental",
+    value: 2450936.11,
+  },
+  {
+    label: "SaÃºde, Estado E CooperaÃ§Ã£o Internacional",
+    value: 1050000,
+  },
+];
+
 function normalizeInstrumentType(value) {
   if (value === "EMENDAS") return "EMENDA PARLAMENTAR";
   return value || "Não informado";
@@ -93,10 +116,15 @@ function groupInstrumentTypes(items) {
     const current = groups.get(label) || {
       label,
       value: 0,
+      detailValue: 0,
+      detailTotalValue: 0,
+      detailLabel: "Total",
       color: instrumentColors[label],
     };
 
     current.value += 1;
+    current.detailValue += Number(project.total || 0);
+    current.detailTotalValue += Number(project.total || 0);
     groups.set(label, current);
   });
 
@@ -236,14 +264,11 @@ function App() {
   );
 
   const funderItems = useMemo(
-    () => groupBySum(filteredProjects, "funder", "total").slice(0, 8),
+    () => groupBySum(filteredProjects, "funder", "total"),
     [filteredProjects],
   );
 
-  const axisItems = useMemo(
-    () => groupBySum(filteredProjects, "axis", "total").slice(0, 6),
-    [filteredProjects],
-  );
+  const axisItems = strategicAxisItems;
 
   const coordinationGroups = useMemo(
     () =>
@@ -277,25 +302,7 @@ function App() {
       
       info: "Linhas da planilha que entram no recorte atual.",
     },
-    {
-      label: "Coordenações",
-      value: new Set(filteredProjects.map((project) => project.unit)).size,
-      detail: "campo Coordenação",
-      info: "Conta as áreas responsáveis diferentes.",
-    },
-    {
-      label: "Financiadores",
-      value: new Set(filteredProjects.map((project) => project.funder)).size,
-      detail: "campo Ente Financiador",
-      info: "Mostra quantos entes financiam os projetos filtrados.",
-    },
-    {
-      label: "Instrumentos",
-      value: new Set(filteredProjects.map((project) => project.instrumentType))
-        .size,
-      detail: "tipos contratuais",
-      info: "Conta as modalidades contratuais da seleção.",
-    },
+ 
     {
       label: "TED de suporte",
       value: totals.supportTedCount,
@@ -327,12 +334,7 @@ function App() {
             <p>Situação em Junho 26</p>
           </div>
         </div>
-        <div className="topbar-actions">
-          <div className="source-badge">
-            <strong>127</strong>
-            <span>projetos</span>
-          </div>
-        </div>
+       
       </header>
 
       <section className="filter-shell" aria-label="Filtros da base GEREB">
@@ -422,8 +424,9 @@ function App() {
         </div>
       </section>
 
-      <section className="portfolio-band" aria-label="Resumo da carteira">
-        {portfolioStats.map((stat) => (
+      <section className="summary-board" aria-label="Resumo da carteira">
+        <div className="portfolio-band">
+          {portfolioStats.map((stat) => (
           <article
             className={stat.tone ? `portfolio-stat portfolio-stat--${stat.tone}` : "portfolio-stat"}
             key={stat.label}
@@ -437,10 +440,10 @@ function App() {
             <span>{stat.label}</span>
             <strong>{stat.value}</strong>
           </article>
-        ))}
-      </section>
+          ))}
+        </div>
 
-      <section className="kpi-row kpi-row--financial">
+        <div className="kpi-row kpi-row--financial">
         <MetricCard
           label="Valor total dos instrumentos"
           value= "R$ 1.465.211.460,06"
@@ -458,21 +461,21 @@ function App() {
         />
         <MetricCard
           label="Recurso a receber"
-          value=" R$ 634.326.282,42"
+          value="R$ 863.684.583,50"
           info="Valor previsto que ainda não foi liberado."
           detail="Previsão ainda não liberada"
           tone="amber"
         />
         <MetricCard
           label="Total realizado"
-          value=" R$ 579.305.223,50"
+          value="R$ 667.327.428,72"
           info="Soma executada ou gasta pelos projetos."
           detail={`${percent.format(executionRate)} executado`}
           tone="violet"
         />
         <MetricCard
           label="Total comprometido"
-          value="R$ 51.421.522,57"
+          value="R$ 138.499.218,72"
           info="Compromissos registrados, ainda não necessariamente pagos."
           detail="Compromissos registrados"
           tone="red"
@@ -484,6 +487,7 @@ function App() {
           detail={`${brl.format(availableCash)} caixa livre`}
           tone={totals.balance < 0 ? "red" : "green"}
         />
+        </div>
       </section>
 
       <section className="dashboard-grid">
@@ -497,6 +501,9 @@ function App() {
               : [{ label: "Sem dados", value: 1 }]
           }
           detailTitle="Detalhamento"
+          showDetailCount
+          showDetailFacts={false}
+          showDetailTotal
           valueType="count"
         />
       </section>
@@ -536,6 +543,8 @@ function App() {
           info="Mostra quais entes financiadores concentram o maior valor contratado na carteira filtrada."
           items={funderItems}
           limit={8}
+          expandable
+          wideLabels
         />
         <DonutChart
           title="Naturezas dos Projetos"
@@ -545,6 +554,9 @@ function App() {
             natureItems.length ? natureItems : [{ label: "Sem dados", value: 1 }]
           }
           detailTitle="Detalhamento"
+          showDetailCount
+          showDetailFacts={false}
+          showDetailTotal
         />
       </section>
 
@@ -555,6 +567,8 @@ function App() {
           info="Organiza o valor contratado pelos eixos estratégicos informados na planilha, ajudando a ver quais temas concentram mais recursos."
           items={axisItems}
           limit={6}
+          fullValues
+          roomyLabels
         />
       </section>
 
