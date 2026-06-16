@@ -3,10 +3,10 @@ import { BarList } from "./components/BarList";
 import { CardHelpButton } from "./components/CardHelpButton";
 import { ColumnChart } from "./components/ColumnChart";
 import { DonutChart } from "./components/DonutChart";
-import { FinancialFlow } from "./components/FinancialFlow";
 import { MetricCard } from "./components/MetricCard";
 import { ProjectTable } from "./components/ProjectTable";
-import fiocruzLogo from "./assets/fiocruz-50anos.png";
+import { ResourceDistribution } from "./components/ResourceDistribution";
+import fiocruzLogo from "./assets/fiocruz-logo.svg";
 import { projects } from "./data/projects";
 import {
   brl,
@@ -87,6 +87,8 @@ function groupInstrumentTypes(items) {
   const groups = new Map();
 
   items.forEach((project) => {
+    if (project.instrumentType === "EMENDAS") return;
+
     const label = normalizeInstrumentType(project.instrumentType);
     const current = groups.get(label) || {
       label,
@@ -112,7 +114,6 @@ const projectOptions = [allOption, ...projects.map((project) => project.id)];
 const modalityOptions = optionList(
   projects.map((project) => project.instrumentType),
 );
-const areaOptions = optionList(projects.map((project) => project.unit));
 const funderOptions = optionList(projects.map((project) => project.funder));
 const natureOptions = optionList(projects.map((project) => project.nature));
 const axisOptions = optionList(projects.map((project) => project.axis));
@@ -124,7 +125,6 @@ function App() {
   const [filters, setFilters] = useState({
     project: allOption,
     modality: allOption,
-    area: allOption,
     funder: allOption,
     nature: allOption,
     axis: allOption,
@@ -145,8 +145,6 @@ function App() {
         const matchesModality =
           filters.modality === allOption ||
           project.instrumentType === filters.modality;
-        const matchesArea =
-          filters.area === allOption || project.unit === filters.area;
         const matchesFunder =
           filters.funder === allOption || project.funder === filters.funder;
         const matchesNature =
@@ -165,7 +163,6 @@ function App() {
         return (
           matchesProject &&
           matchesModality &&
-          matchesArea &&
           matchesFunder &&
           matchesNature &&
           matchesAxis &&
@@ -307,7 +304,6 @@ function App() {
     setFilters({
       project: allOption,
       modality: allOption,
-      area: allOption,
       funder: allOption,
       nature: allOption,
       axis: allOption,
@@ -321,7 +317,7 @@ function App() {
     <main className="finance-dashboard">
       <header className="topbar">
         <div className="brandline">
-          <img className="brand-logo" src={fiocruzLogo} alt="Fiocruz Brasília" />
+          <img className="brand-logo" src={fiocruzLogo} alt="Fiocruz Fundação Oswaldo Cruz" />
           <div>
             <h1>Painel de Projetos GEREB</h1>
             <p>Situação em Junho 26</p>
@@ -329,8 +325,8 @@ function App() {
         </div>
         <div className="topbar-actions">
           <div className="source-badge">
-            <span>{projects.length} projetos</span>
-           
+            <strong>127</strong>
+            <span>projetos</span>
           </div>
         </div>
       </header>
@@ -347,12 +343,6 @@ function App() {
           value={filters.modality}
           onChange={(value) => updateFilter("modality", value)}
           options={modalityOptions}
-        />
-        <FilterSelect
-          label="Coordenação"
-          value={filters.area}
-          onChange={(value) => updateFilter("area", value)}
-          options={areaOptions}
         />
         <FilterSelect
           label="Ente financiador"
@@ -422,7 +412,6 @@ function App() {
             />
             <span>{stat.label}</span>
             <strong>{stat.value}</strong>
-            <small>{stat.detail}</small>
           </article>
         ))}
       </section>
@@ -474,14 +463,7 @@ function App() {
       </section>
 
       <section className="dashboard-grid">
-        <FinancialFlow
-          total={totals.total}
-          released={totals.released}
-          receivable={totals.receivable}
-          realized={totals.realized}
-          committed={totals.committed}
-          balance={totals.balance}
-        />
+        <ResourceDistribution />
         <DonutChart
           title="Tipos de Instrumentos"
           info="Mostra a distribuição dos projetos por tipo de instrumento contratual."
@@ -539,7 +521,6 @@ function App() {
             natureItems.length ? natureItems : [{ label: "Sem dados", value: 1 }]
           }
           detailTitle="Detalhamento"
-          valueType="count"
         />
       </section>
 

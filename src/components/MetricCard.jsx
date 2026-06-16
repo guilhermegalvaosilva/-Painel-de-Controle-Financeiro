@@ -11,7 +11,6 @@ export function MetricCard({ label, value, detail, info, tone = 'default', forma
       ) : null}
       <span>{label}</span>
       <strong>{displayValue}</strong>
-      <small>{detail}</small>
     </article>
   )
 }
