@@ -80,23 +80,23 @@ const instrumentColors = {
 
 const strategicAxisItems = [
   {
-    label: "AtenÃ§Ã£o, PromoÃ§Ã£o, VigilÃ¢ncias, GeraÃ§Ã£o De Conhecimentos E FormaÃ§Ã£o Para O Sus",
+    label: "Atenção, Promoção, Vigilâncias, Geração de Conhecimentos e Formação para o SUS",
     value: 1005587479.05,
   },
   {
-    label: "CiÃªncia, Tecnologia, SaÃºde E Sociedade",
+    label: "Ciência, Tecnologia, Saúde e Sociedade",
     value: 389364521.01,
   },
   {
-    label: "InovaÃ§Ã£o E Complexo Produtivo Em SaÃºde",
+    label: "Inovação e Complexo Produtivo em Saúde",
     value: 25092610,
   },
   {
-    label: "SaÃºde E Sustentabilidade Socioambiental",
+    label: "Saúde e Sustentabilidade Socioambiental",
     value: 2450936.11,
   },
   {
-    label: "SaÃºde, Estado E CooperaÃ§Ã£o Internacional",
+    label: "Saúde, Estado e Cooperação Internacional",
     value: 1050000,
   },
 ];
