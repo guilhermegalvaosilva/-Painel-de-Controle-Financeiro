@@ -13,7 +13,7 @@ const resources = [
   },
   {
     label: 'TEDs outros Orgãos',
-    value: 313989543.95,
+    value: 213639543.95,
     color: '#77C6CC',
   },
 ]
